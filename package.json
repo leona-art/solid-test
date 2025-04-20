@@ -1,5 +1,5 @@
 {
-  "name": "example-with-tailwindcss",
+  "name": "solid-sample",
   "type": "module",
   "scripts": {
     "dev": "vinxi dev",
