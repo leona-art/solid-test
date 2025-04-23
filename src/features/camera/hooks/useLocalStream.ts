@@ -2,12 +2,19 @@ import { createSignal } from "solid-js"
 
 export function useLocalStream(){
     const [stream, setStream] = createSignal<MediaStream | null>(null)
+    const isStreamActive = () => stream() !== null
 
     const startStream = async () => {
+        if (isStreamActive()) {
+            console.warn("Stream is already active.")
+            return
+        }
         try {
             const mediaStream = await navigator.mediaDevices.getUserMedia({
-                video: true,
-                audio: true,
+                video: {
+                    facingMode:"environment",
+                },
+                audio: false,
             })
             setStream(mediaStream)
         } catch (error) {
@@ -20,7 +27,7 @@ export function useLocalStream(){
             setStream(null)
         }
     }
-    const isStreamActive = () => stream() !== null
+    
 
     return {
         stream,
