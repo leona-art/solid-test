@@ -1,17 +1,18 @@
 // src/components/QRCodeScanner.tsx
-import { Show } from 'solid-js';
+import { createSignal, Show } from 'solid-js';
 import { useCameraScanner } from '../hooks/useScanner'; // パスを適切に設定
 
 export const Scanner = () => {
+  const [videoRef, setVideoRef] = createSignal<HTMLVideoElement | null>(null);
   // カスタムフックを利用
   const {
     startCamera,
     stopCamera,
     isCameraActive,
     error,
-    setVideoRef // video要素設定用の関数を取得
-  } = useCameraScanner();
-
+  } = useCameraScanner(videoRef);
+  
+  
   return (
     <div class="p-4 border rounded-lg shadow-md max-w-md mx-auto">
       <h2 class="text-xl font-semibold mb-4 text-center">QRコードスキャナー</h2>
