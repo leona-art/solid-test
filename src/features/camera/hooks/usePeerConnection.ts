@@ -1,10 +1,34 @@
 import { createSignal, onCleanup, onMount } from "solid-js";
+import { useSignalingClient } from "./useSignaling";
 
 export function usePeerConnection(sendMessage: (message: string) => void) {
     const [peerConnection, setPeerConnection] = createSignal<RTCPeerConnection | null>(null);
     const [remoteStream, setRemoteStream] = createSignal<MediaStream | null>(null);
-
-
+    const [connectionState, setConnectionState] = createSignal<RTCSignalingState>("stable");
+    const { sendOffer, sendAnswer, sendIceCandidate } = useSignalingClient("", {
+        onAnswer: async (answer) => {
+            console.log("Received answer:", answer);
+            const pc = peerConnection();
+            if (!pc) return;
+            await pc.setRemoteDescription(answer);
+            setConnectionState(pc.signalingState);
+        },
+        onIceCandidate: async (candidate) => {
+            console.log("Received ICE candidate:", candidate);
+            const pc = peerConnection();
+            if (!pc) return;
+            await pc.addIceCandidate(candidate)
+            console.log("ICE candidate added successfully");
+            setConnectionState(pc.signalingState);
+        },
+        onOffer: async (offer) => {
+            console.log("Received offer:", offer);
+            const pc = peerConnection();
+            if (!pc) return;
+            await pc.setRemoteDescription(offer);
+            setConnectionState(pc.signalingState);
+        }
+    })
 
     onMount(() => {
         const pc = new RTCPeerConnection({
@@ -18,7 +42,7 @@ export function usePeerConnection(sendMessage: (message: string) => void) {
         pc.onicecandidate = (event) => {
             if (event.candidate) {
                 console.log("ICE Candidate:", event.candidate);
-                sendMessage(JSON.stringify({ type: "iceCandidate", payload: event.candidate }));
+                sendIceCandidate(event.candidate);
             }
         };
 

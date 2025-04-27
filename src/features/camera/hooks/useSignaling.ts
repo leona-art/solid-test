@@ -8,9 +8,9 @@ export function useSignalingClient(url: string, {
     onAnswer,
     onIceCandidate,
 }: {
-    onOffer: (offer: RTCSessionDescriptionInit) => void
-    onAnswer: (answer: RTCSessionDescriptionInit) => void
-    onIceCandidate: (candidate: RTCIceCandidateInit) => void
+    onOffer: (offer: RTCSessionDescriptionInit) => Promise<void>
+    onAnswer: (answer: RTCSessionDescriptionInit) => Promise<void>
+    onIceCandidate: (candidate: RTCIceCandidateInit) => Promise<void>
 }) {
     const [ws, setWs] = createSignal<WebSocket | null>(null)
     const [error, setError] = createSignal<string | null>(null)
